@@ -9,7 +9,7 @@ This article is not intended to be a tutorial on routing in Angular. If you are 
 
 ## Background
 
-The following represents a pattern that I've developed at my day job after building several enterpirse Angular applications. While most online tutorials do a great job laying out the fundamentals, I had a hard time locating articles that showed recommended conventions and patterns for large and scalable applications.
+The following represents a pattern that I've developed at my day job after building several enterprise Angular applications. While most online tutorials do a great job laying out the fundamentals, I had a hard time locating articles that showed recommended conventions and patterns for large and scalable applications.
 
 With this pattern you should have a clean and concise organization for all routing related concerns in your applications.
 
