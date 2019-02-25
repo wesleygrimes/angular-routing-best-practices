@@ -1,27 +1,233 @@
-# AngularRoutingBestPractices
+![](https://wesleygrimes.com/assets/post_headers/routing.jpg)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.3.2.
+---
 
-## Development server
+## Before We Get Started
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+This article is not intended to be a tutorial on routing in Angular. If you are new to Routing in Angular then I highly recommend you check out one of the the following resources:
 
-## Code scaffolding
+- [Ultimate Courses](https://bit.ly/2WubqhW)
+- [Official Angular Docs](https://angular.io/guide/router)
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+---
 
-## Build
+## Background
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+The following represents a pattern that I've developed at my day job after building several enterpirse Angular applications. While most online tutorials do a great job laying out the fundamentals, I had a hard time locating articles that showed recommended conventions and patterns for large and scalable applications.
 
-## Running unit tests
+With this pattern you should have a clean and concise organization for all routing related concerns in your applications.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+---
 
-## Running end-to-end tests
+## Prerequisites
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+For context, this article assumes you are using the following version of Angular:
 
-## Further help
+- Angular v7.2.6
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+---
+
+## Best Practice #1 - Create an `app.routes.ts` file
+
+> The official [Angular docs recommend](https://angular.io/guide/router#refactor-the-routing-configuration-into-a-routing-module) creating a full-blown `app-routing.module.ts` for your top-level routing. I have found this extra layer to be unnecessary in most cases.
+
+Let's go with the following approach:
+
+1. Create a new file named `app.routes.ts` in the root `src/app` directory. This file will hold our top-level `Routes` array. We will come back later throughout the article and fill this in. For now, let's scaffold it with the following contents:
+
+> HOT TIP: Only register top-level routes here, if you plan to implement feature modules, then the child routes would live underneath the respective `feature.routes.ts` file. We want to keep this top-level routes file as clean as possible and follow the component tree structure.
+
+```typescript
+import { Routes } from '@angular/router';
+
+export const AppRoutes: Routes = [];
+```
+
+2. Register `AppRoutes` in the `app.module.ts` file.
+
+- Import `AppRoutes` from `app.routes.ts`.
+- Import `RouterModule` from `@angular/router`.
+- Add `RouterModule.forRoot(AppRoutes)` to your `imports` array
+
+Your updated `app.module.ts` will look similar to the following:
+
+```typescript
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { RouterModule } from '@angular/router';
+import { AppComponent } from './app.component';
+import { AppRoutes } from './app.routes';
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [BrowserModule, RouterModule.forRoot(AppRoutes)],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule {}
+```
+
+## Best Practice #2 - Create a `feature/feature.routes.ts` for each feature
+
+In similar fashion to how we constructed the `app.routes.ts` we will create a `feature.routes.ts` to list out the individual routes for this feature module. We want to keep our routes as close to the source as possible. This will be in keeping with a clean code approach, and having a good separation of concerns.
+
+1. Create a new file named `feature/feature.routes.ts` where `feature` matches the name of your `feature.module.ts` prefix. This file will hold our feature-level `Routes` array. Keeping in mind that you would replace `Feature` with the actual name of your module, let's scaffold it with the following contents:
+
+```typescript
+import { Routes } from '@angular/router';
+
+export const FeatureRoutes: Routes = [];
+```
+
+2. Register `FeatureRoutes` in the `feature/feature.module.ts` file. We will make use of the `RouterModule.forChild` import so that these routes are automatically registered with lazy loading.
+
+- Import `FeatureRoutes` from `feature.routes.ts`.
+- Import `RouterModule` from `@angular/router`.
+- Add `RouterModule.forChild(FeatureRoutes)` to your `imports` array
+
+Your updated `feature/feature.module.ts` will look similar to the following:
+
+```typescript
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { FeatureRoutes } from './feature.routes';
+
+@NgModule({
+  declarations: [],
+  imports: [CommonModule, RouterModule.forChild(FeatureRoutes)]
+})
+export class FeatureModule {}
+```
+
+## Best Practice #3 - Add Lazy Loaded Features to `app.routes.ts`
+
+> Lazy loading is the concept of deferring load of code assets (javascript, styles) until the user actually needs to utilize the resources. This can bring large performance increases to perceived load times of your application as the entire code set doesn't have to download on first paint.
+
+> Angular provides a nice way to handle this with the `loadChildren` option for a given route. More information can be found in the [official Angular docs](https://angular.io/guide/router#lazy-loading-route-configuration).
+
+Once you've created your `app.routes.ts` and `*.routes.ts` files, you need to register any feature modules that you want to load lazily.
+
+### Per Feature Module...
+
+Update the `AppRoutes` array in the `app.routes.ts` file to include a new route the feature:
+
+```typescript
+import { Routes } from '@angular/router';
+
+export const AppRoutes: Routes = [
+  {
+    path: 'feature',
+    loadChildren: './feature/feature.module#FeatureModule'
+  }
+];
+```
+
+By adding the above route to the array, when the user requests `/feature` in the browser, Angular lazy loads the module using the path given and then automatically registers any routes defined in the `feature.routes.ts` `FeatureRoutes` array using the `RouterModule.forChild` import.
+
+For each additional feature module, you would add another item to the `AppRoutes` array. If you have multiple features, it might look something like the following:
+
+```typescript
+import { Routes } from '@angular/router';
+
+export const AppRoutes: Routes = [
+  {
+    path: 'feature-a',
+    loadChildren: './feature-a/feature-a.module#FeatureAModule'
+  },
+  {
+    path: 'feature-b',
+    loadChildren: './feature-b/feature-b.module#FeatureBModule'
+  }
+];
+```
+
+## Best Practice #4 - Keep Router Guards Organized
+
+> TODO: Guards definition here
+
+Here are a few tips to keep your router guards organized. These are just guidelines, but I have found them to be very helpful.
+
+### Name Your Guards Well
+
+Guards should use the following naming convention:
+
+- File Name: `name.function.guard.ts`
+- Class Name: `NameFunctionGuard`
+
+Each part being identified as:
+
+- `name` - this is the name of your guard. What are you guarding against?
+- `function` - this is the function your guard will be attached to. Angular supports `CanActivate`, `CanActivateChild`, `CanDeactivate`, and `Resolve`.
+
+An example of an Auth Guard that is attached to the `CanActivate` function would be named as follows:
+
+- File Name: `auth.can-activate.guard`
+- Class Name: `AuthCanActivateGuard`
+
+### Group under `_guards` folder
+
+Organize all top-level guards under a folder named `src/app/_guards`. I have seen apps dump guards in the top level directory and this is messy, especially if you end up with more than a few guards.
+
+### Use Barrel Exports
+
+Make sure that `src/app/_guards` has a nice and clean `index.ts` barrel export. Barrel exports are simply `index.ts` files that group together and export all public files from a directory. An example is as follows:
+
+```typescript
+export * from './auth.can-activate.guard';
+export * from './require-save.can-deactivate.guard';
+```
+
+Without Barrel Exporting (BAD):
+
+```typescript
+import { AuthCanActivateGuard } from 'src/app/_guards/auth.can-activate.guard';
+import { RequireSaveCanDeactivateGuard } from 'src/app/_guards/require-save.can-deactivate.guard';
+```
+
+With Barrel Exporting (GOOD):
+
+```typescript
+import {
+  AuthCanActivateGuard,
+  RequireSaveCanDeactivateGuard
+} from 'src/app/_guards';
+```
+
+An example application with a `_guards` directory would look as follows:
+
+![](https://wesleygrimes.com/assets/post_headers/routing_directory.png)
+
+### Organize Feature-Specific Route Guards
+
+If you have guards that are _only_ used in a particular `FeatureRoutes` array, then store these routes underneath a folder named `_guards` underneath your feature folder. Make sure to follow the same naming conventions defined above, as well as barrel exporting.
+
+- Place guards under a folder named `_guards` underneath your feature folder
+- Make sure to create a barrel export `index.ts` for clean importing
+- Make sure that your feature specific guards are _NOT_ decorated with `@Injectable({providedIn: 'root'})` otherwise they will not be lazy loaded. In order to use the guards, edit the `feature.module.ts` and add the feature-specific guards to the `providers` array of the `FeatureModule`.
+
+An example feature directory with `_guards` would look as follows:
+
+![](https://wesleygrimes.com/assets/post_headers/routing_feature_directory.png)
+
+---
+
+## Finished Application Structure
+
+A completed application structure should look something like the following:
+
+![](https://wesleygrimes.com/assets/post_headers/routing_completed_structure.png)
+
+---
+
+## Example GitHub Repository
+
+I have created a demonstration repository on GitHub. Feel free to fork, clone, and submit PRs.
+
+[https://github.com/wesleygrimes/angular-routing-best-practices](https://github.com/wesleygrimes/angular-routing-best-practices)
+
+---
+
+## Conclusion
+
+It's important to remember that I have implemented these best practices in several "real world" applications. While I have found these best practices helpful, and maintainable, I do not believe they are an end-all be-all solution to organizing routes in projects; it's just what has worked for me. I am curious as to what you all think? Please feel free to offer any suggestions, tips, or best practices you've learned when building enterprise Angular applications with routing and I will update the article to reflect as such. Happy Coding!
