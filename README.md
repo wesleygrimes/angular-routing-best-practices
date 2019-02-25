@@ -132,12 +132,17 @@ import { Routes } from '@angular/router';
 
 export const AppRoutes: Routes = [
   {
-    path: 'feature-a',
-    loadChildren: './feature-a/feature-a.module#FeatureAModule'
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'feature-one'
   },
   {
-    path: 'feature-b',
-    loadChildren: './feature-b/feature-b.module#FeatureBModule'
+    path: 'feature-one',
+    loadChildren: './feature-one/feature-one.module#FeatureOneModule'
+  },
+  {
+    path: 'feature-two',
+    loadChildren: './feature-two/feature-two.module#FeatureTwoModule'
   }
 ];
 ```
