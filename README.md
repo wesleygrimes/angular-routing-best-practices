@@ -143,8 +143,6 @@ export const AppRoutes: Routes = [
 
 ## Best Practice #4 - Keep Router Guards Organized
 
-> TODO: Guards definition here
-
 Here are a few tips to keep your router guards organized. These are just guidelines, but I have found them to be very helpful.
 
 ### Name Your Guards Well
