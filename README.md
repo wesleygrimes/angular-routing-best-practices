@@ -94,6 +94,27 @@ import { FeatureRoutes } from './feature.routes';
 export class FeatureModule {}
 ```
 
+An example of a `feature.routes.ts` file with child route(s) may look like the following:
+
+```typescript
+import { Routes } from '@angular/router';
+import { FeatureOneComponent } from './feature-one.component';
+import { FeatureSpecificCanActivateGuard } from './_guards';
+
+export const FeatureOneRoutes: Routes = [
+  {
+    path: '',
+    pathMatch: 'full',
+    redirectTo: 'feature-one-component'
+  },
+  {
+    path: 'feature-one-component',
+    component: FeatureOneComponent,
+    canActivate: [FeatureSpecificCanActivateGuard]
+  }
+];
+```
+
 ## Best Practice #3 - Add Lazy Loaded Features to top-level Routes file
 
 > Lazy loading is the concept of deferring load of code assets (javascript, styles) until the user actually needs to utilize the resources. This can bring large performance increases to perceived load times of your application as the entire code set doesn't have to download on first paint.
