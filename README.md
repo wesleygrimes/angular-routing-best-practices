@@ -218,7 +218,7 @@ import {
 
 An example application with a `_guards` directory would look as follows:
 
-![](/assets/post_headers/routing_directory.png)
+![](https://wesleygrimes.com/assets/post_headers/routing_directory.png)
 
 ### Organize Feature-Specific Route Guards
 
@@ -229,13 +229,13 @@ If you have guards that are _only_ used in a particular `FeatureRoutes` array, t
 
 An example feature directory with `_guards` would look as follows:
 
-![](/assets/post_headers/routing_feature_directory.png)
+![](https://wesleygrimes.com/assets/post_headers/routing_feature_directory.png)
 
 ## Finished Application Structure
 
 A completed application structure should look something like the following:
 
-![](/assets/post_headers/routing_completed_structure.png)
+![](https://wesleygrimes.com/assets/post_headers/routing_completed_structure.png)
 
 ---
 
