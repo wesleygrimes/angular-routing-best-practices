@@ -1,3 +1,5 @@
+<div class="ultimate-courses-banner"><a href="https://ultimatecourses.com/angular?ref=76683_ttll_neb"><img src="https://ultimatecourses.com/assets/img/banners/ultimate-angular-leader.svg" style="width:100%;max-width:100%"></a></div>
+
 ![](https://wesleygrimes.com/assets/post_headers/routing.jpg)
 
 ## Before We Get Started
@@ -25,41 +27,41 @@ For context, this article assumes you are using the following version of Angular
 
 > The official [Angular docs recommend](https://angular.io/guide/router#refactor-the-routing-configuration-into-a-routing-module) creating a full-blown `app-routing.module.ts` for your top-level routing. I have found this extra layer to be unnecessary in most cases.
 
+> HOT TIP: Only register top-level routes here, if you plan to implement feature modules, then the child routes would live underneath the respective `feature.routes.ts` file. We want to keep this top-level routes file as clean as possible and follow the component tree structure.
+
 Let's go with the following approach:
 
 1. Create a new file named `app.routes.ts` in the root `src/app` directory. This file will hold our top-level `Routes` array. We will come back later throughout the article and fill this in. For now, let's scaffold it with the following contents:
 
-> HOT TIP: Only register top-level routes here, if you plan to implement feature modules, then the child routes would live underneath the respective `feature.routes.ts` file. We want to keep this top-level routes file as clean as possible and follow the component tree structure.
+   ```typescript
+   import { Routes } from '@angular/router';
 
-```typescript
-import { Routes } from '@angular/router';
-
-export const AppRoutes: Routes = [];
-```
+   export const AppRoutes: Routes = [];
+   ```
 
 2. Register `AppRoutes` in the `app.module.ts` file.
 
-- Import `AppRoutes` from `app.routes.ts`.
-- Import `RouterModule` from `@angular/router`.
-- Add `RouterModule.forRoot(AppRoutes)` to your `imports` array
+   - Import `AppRoutes` from `app.routes.ts`.
+   - Import `RouterModule` from `@angular/router`.
+   - Add `RouterModule.forRoot(AppRoutes)` to your `imports` array
 
-Your updated `app.module.ts` will look similar to the following:
+   Your updated `app.module.ts` will look similar to the following:
 
-```typescript
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
-import { AppComponent } from './app.component';
-import { AppRoutes } from './app.routes';
+   ```typescript
+   import { NgModule } from '@angular/core';
+   import { BrowserModule } from '@angular/platform-browser';
+   import { RouterModule } from '@angular/router';
+   import { AppComponent } from './app.component';
+   import { AppRoutes } from './app.routes';
 
-@NgModule({
-  declarations: [AppComponent],
-  imports: [BrowserModule, RouterModule.forRoot(AppRoutes)],
-  providers: [],
-  bootstrap: [AppComponent]
-})
-export class AppModule {}
-```
+   @NgModule({
+     declarations: [AppComponent],
+     imports: [BrowserModule, RouterModule.forRoot(AppRoutes)],
+     providers: [],
+     bootstrap: [AppComponent]
+   })
+   export class AppModule {}
+   ```
 
 ## Best Practice #2 - Create a feature-level Routes array file
 
@@ -67,53 +69,53 @@ In similar fashion to how we constructed the `app.routes.ts` we will create a `f
 
 1. Create a new file named `feature/feature.routes.ts` where `feature` matches the name of your `feature.module.ts` prefix. This file will hold our feature-level `Routes` array. Keeping in mind that you would replace `Feature` with the actual name of your module, let's scaffold it with the following contents:
 
-```typescript
-import { Routes } from '@angular/router';
+   ```typescript
+   import { Routes } from '@angular/router';
 
-export const FeatureRoutes: Routes = [];
-```
+   export const FeatureRoutes: Routes = [];
+   ```
 
 2. Register `FeatureRoutes` in the `feature/feature.module.ts` file. We will make use of the `RouterModule.forChild` import so that these routes are automatically registered with lazy loading.
 
-- Import `FeatureRoutes` from `feature.routes.ts`.
-- Import `RouterModule` from `@angular/router`.
-- Add `RouterModule.forChild(FeatureRoutes)` to your `imports` array
+   - Import `FeatureRoutes` from `feature.routes.ts`.
+   - Import `RouterModule` from `@angular/router`.
+   - Add `RouterModule.forChild(FeatureRoutes)` to your `imports` array
 
-Your updated `feature/feature.module.ts` will look similar to the following:
+   Your updated `feature/feature.module.ts` will look similar to the following:
 
-```typescript
-import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { RouterModule } from '@angular/router';
-import { FeatureRoutes } from './feature.routes';
+   ```typescript
+   import { CommonModule } from '@angular/common';
+   import { NgModule } from '@angular/core';
+   import { RouterModule } from '@angular/router';
+   import { FeatureRoutes } from './feature.routes';
 
-@NgModule({
-  declarations: [],
-  imports: [CommonModule, RouterModule.forChild(FeatureRoutes)]
-})
-export class FeatureModule {}
-```
+   @NgModule({
+     declarations: [],
+     imports: [CommonModule, RouterModule.forChild(FeatureRoutes)]
+   })
+   export class FeatureModule {}
+   ```
 
-An example of a `feature.routes.ts` file with child route(s) may look like the following:
+   An example of a `feature.routes.ts` file with child route(s) may look like the following:
 
-```typescript
-import { Routes } from '@angular/router';
-import { FeatureOneComponent } from './feature-one.component';
-import { FeatureSpecificCanActivateGuard } from './_guards';
+   ```typescript
+   import { Routes } from '@angular/router';
+   import { FeatureOneComponent } from './feature-one.component';
+   import { FeatureSpecificCanActivateGuard } from './_guards';
 
-export const FeatureOneRoutes: Routes = [
-  {
-    path: '',
-    pathMatch: 'full',
-    redirectTo: 'feature-one-component'
-  },
-  {
-    path: 'feature-one-component',
-    component: FeatureOneComponent,
-    canActivate: [FeatureSpecificCanActivateGuard]
-  }
-];
-```
+   export const FeatureOneRoutes: Routes = [
+     {
+       path: '',
+       pathMatch: 'full',
+       redirectTo: 'feature-one-component'
+     },
+     {
+       path: 'feature-one-component',
+       component: FeatureOneComponent,
+       canActivate: [FeatureSpecificCanActivateGuard]
+     }
+   ];
+   ```
 
 ## Best Practice #3 - Add Lazy Loaded Features to top-level Routes file
 
@@ -189,6 +191,8 @@ Organize all top-level guards under a folder named `src/app/_guards`. I have see
 
 ### Use Barrel Exports
 
+> The jury is still out on whether or not using barrel exports is officially considered a "best practice" or even supported by the Angular style guide. However, I am a big fan of the clean organization this provides. This method is offered as a suggestion.
+
 Make sure that `src/app/_guards` has a nice and clean `index.ts` barrel export. Barrel exports are simply `index.ts` files that group together and export all public files from a directory. An example is as follows:
 
 ```typescript
@@ -196,14 +200,14 @@ export * from './auth.can-activate.guard';
 export * from './require-save.can-deactivate.guard';
 ```
 
-Without Barrel Exporting (BAD):
+Without Barrel Exporting:
 
 ```typescript
 import { AuthCanActivateGuard } from 'src/app/_guards/auth.can-activate.guard';
 import { RequireSaveCanDeactivateGuard } from 'src/app/_guards/require-save.can-deactivate.guard';
 ```
 
-With Barrel Exporting (GOOD):
+With Barrel Exporting:
 
 ```typescript
 import {
@@ -214,7 +218,7 @@ import {
 
 An example application with a `_guards` directory would look as follows:
 
-![](https://wesleygrimes.com/assets/post_headers/routing_directory.png)
+![](/assets/post_headers/routing_directory.png)
 
 ### Organize Feature-Specific Route Guards
 
@@ -222,17 +226,16 @@ If you have guards that are _only_ used in a particular `FeatureRoutes` array, t
 
 - Place guards under a folder named `_guards` underneath your feature folder
 - Make sure to create a barrel export `index.ts` for clean importing
-- Make sure that your feature specific guards are _NOT_ decorated with `@Injectable({providedIn: 'root'})` otherwise they will not be lazy loaded. In order to use the guards, edit the `feature.module.ts` and add the feature-specific guards to the `providers` array of the `FeatureModule`.
 
 An example feature directory with `_guards` would look as follows:
 
-![](https://wesleygrimes.com/assets/post_headers/routing_feature_directory.png)
+![](/assets/post_headers/routing_feature_directory.png)
 
 ## Finished Application Structure
 
 A completed application structure should look something like the following:
 
-![](https://wesleygrimes.com/assets/post_headers/routing_completed_structure.png)
+![](/assets/post_headers/routing_completed_structure.png)
 
 ---
 
